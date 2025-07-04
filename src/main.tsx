@@ -14,7 +14,7 @@ async function bootstrap() {
 
     if (response) {
       msalInstance.setActiveAccount(response.account);
-      window.history.replaceState({}, document.title, window.location.pathname;);
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   } catch (error) {
     console.error("MSAL initialization or redirect handling error:", error);
