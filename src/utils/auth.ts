@@ -1,7 +1,7 @@
 import type { AccountInfo } from "@azure/msal-browser";
 
 const STORAGE_KEYS = {
-  ID_TOKEN: "t",
+  ID_TOKEN: "i",
   USERNAME: "u",
   ID_ROLES: "r",
 };
