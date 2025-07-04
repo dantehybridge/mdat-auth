@@ -14,7 +14,7 @@ jobs:
       AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      CLOUDFRONT_ID: ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+      AWS_CF_DISTRIBUTION_ID: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
 
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
       - run: pnpm build
 
       - run: |
-            echo "Bucket: $AWS_BUCKET_NAME"
+            echo "CloudFrontID: $AWS_CF_DISTRIBUTION_ID"
 
       - run: |
           aws s3 cp ./dist/index.html s3://$AWS_BUCKET_NAME/index.html \
@@ -56,5 +56,5 @@ jobs:
 
       - run: |
           aws cloudfront create-invalidation \
-            --distribution-id $CLOUDFRONT_ID \
+            --distribution-id $AWS_CF_DISTRIBUTION_ID \
             --paths "/*"
