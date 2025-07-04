@@ -1,29 +1,36 @@
 import React, { useEffect } from "react";
 
 import { msalInstance } from "../utils/msal";
-import { setSessionValue, saveAccountToSession } from "../utils/auth";
+import { setSessionValue, saveAccountToSession, userHasAuthorizationByRoles } from "../utils/auth";
 
 export default function ConfigPage() {
-    useEffect(() => {
-        msalInstance.handleRedirectPromise()
-            .then((response) => {
-                if (response && response.account) {
-                    const account = response.account;
-                    msalInstance.setActiveAccount(account);
+  useEffect(() => {
+    msalInstance.handleRedirectPromise().then((response) => {
+      if (response && response.account) {
+        const account = response.account;
+        msalInstance.setActiveAccount(account);
 
-                    saveAccountToSession(account);
-                    setSessionValue("a", response.accessToken || "");
+        const rolesMEID = account.idTokenClaims?.roles || [];
 
-                    setTimeout(() => {
-                        window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/`;
-                    }, 1500);
-                }
-            })
-    }, []);
+        const hasRoleAuthorization = userHasAuthorizationByRoles(rolesMEID);
 
-    return (
-        <div className="flex items-center justify-center h-screen">
-            <p className="text-gray-600">Processing login...</p>
-        </div>
-    );
-};
+        if (hasRoleAuthorization) {
+          saveAccountToSession(account);
+          setSessionValue("a", response.accessToken || "");
+
+          setTimeout(() => {
+            window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/`;
+          }, 1500);
+        } else {
+          window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/auth/unauth`;
+        }
+      }
+    });
+  }, []);
+
+  return (
+    <div className="flex items-center justify-center h-screen">
+      <p className="text-gray-600">Processing login...</p>
+    </div>
+  );
+}
