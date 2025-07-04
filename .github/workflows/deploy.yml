@@ -23,9 +23,9 @@ jobs:
       id-token: "write"
     environment: ${{ github.event.inputs.environment || 'dev' }}
     env:
-      VITE_CLOUDFRONT_URL: ${{ vars.VITE_CLOUDFRONT_URL}}
-      VITE_MSAL_TENANT_ID: ${{ vars.VITE_MSAL_TENANT_ID}}
-      VITE_MSAL_CLIENT_ID: ${{ vars.VITE_MSAL_CLIENT_ID}}
+      VITE_CLOUDFRONT_URL: ${{ vars.VITE_CLOUDFRONT_URL }}
+      VITE_MSAL_TENANT_ID: ${{ vars.VITE_MSAL_TENANT_ID }}
+      VITE_MSAL_CLIENT_ID: ${{ vars.VITE_MSAL_CLIENT_ID }}
 
     steps:
       - name: Checkout repository
@@ -42,18 +42,17 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Build Application 
+      - name: Build Application
         run: pnpm run build
 
-			- name: Configure AWS credentials
-			  uses: aws-actions/configure-aws-credentials@v4
-			  with:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
 
       - name: Sync files to S3
         run: |
-          # This variable is now sourced from the selected GitHub Environment's variables
           echo "Deploying to bucket ${{ vars.BUCKET_NAME }}/${{ vars.APP_NAME }}/"
           aws s3 sync ./dist s3://${{ vars.BUCKET_NAME }}/${{ vars.APP_NAME }}/ --delete
