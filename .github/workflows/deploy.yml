@@ -1,60 +1,59 @@
-name: mdat-auth Deployment to S3 and CloudFront
+name: Automated Deployment to AWS S3 and CloudFront
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Choose the environment for deployment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - qa
+          - prod
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: dev
-
+    permissions:
+      contents: "read"
+      id-token: "write"
+    environment: ${{ github.event.inputs.environment || 'dev' }}
     env:
-      AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
-      AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_CF_DISTRIBUTION_ID: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+      VITE_CLOUDFRONT_URL: ${{ vars.VITE_CLOUDFRONT_URL}}
+      VITE_MSAL_TENANT_ID: ${{ vars.VITE_MSAL_TENANT_ID}}
+      VITE_MSAL_CLIENT_ID: ${{ vars.VITE_MSAL_CLIENT_ID}}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js and pnpm
+        uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 22
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+      - name: Install pnpm
+        run: npm install -g pnpm
 
-      - run: pnpm install
+      - name: Install Dependencies
+        run: pnpm install
 
-      - run: pnpm build
+      - name: Build Application 
+        run: pnpm run build
 
-      - run: |
-            echo "CloudFrontID: $AWS_CF_DISTRIBUTION_ID"
+			- name: Configure AWS credentials
+			  uses: aws-actions/configure-aws-credentials@v4
+			  with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
 
-      - run: |
-          aws s3 cp ./dist/index.html s3://$AWS_BUCKET_NAME/index.html \
-            --cache-control no-store \
-            --content-type text/html
-
-      - run: |
-          find ./dist/assets -name "*.js" | while read file; do
-            aws s3 cp "$file" "s3://$AWS_BUCKET_NAME/assets/$(basename "$file")" \
-              --cache-control "public, max-age=31536000, immutable" \
-              --content-type application/javascript
-          done
-
-      - run: |
-          find ./dist/assets -name "*.css" | while read file; do
-            aws s3 cp "$file" "s3://$AWS_BUCKET_NAME/assets/$(basename "$file")" \
-              --cache-control "public, max-age=31536000, immutable" \
-              --content-type text/css
-          done
-
-      - run: |
-          aws cloudfront create-invalidation \
-            --distribution-id $AWS_CF_DISTRIBUTION_ID \
-            --paths "/*"
+      - name: Sync files to S3
+        run: |
+          # This variable is now sourced from the selected GitHub Environment's variables
+          echo "Deploying to bucket ${{ vars.BUCKET_NAME }}/${{ vars.APP_NAME }}/"
+          aws s3 sync ./dist s3://${{ vars.BUCKET_NAME }}/${{ vars.APP_NAME }}/ --delete
