@@ -15,7 +15,7 @@ export default function ConfigPage() {
                     setSessionValue("a", response.accessToken || "");
 
                     setTimeout(() => {
-                        window.location.href = `${import.meta.env.CLOUDFRONT_URL}/`;
+                        window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/`;
                     }, 1500);
                 }
             })
