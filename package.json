@@ -1,12 +1,11 @@
 {
-  "name": "mdat-auth",
+  "name": "auth",
   "type": "module",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "vite build"
   },
   "dependencies": {
     "@azure/msal-browser": "^4.13.0",
@@ -16,10 +15,10 @@
     "react-router-dom": "^6.23.1"
   },
   "devDependencies": {
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
-    "@vitejs/plugin-react": "^4.6.0",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.5.2",
     "typescript": "~5.8.3",
-    "vite": "^6.3.5"
+    "vite": "^7.0.0"
   }
 }
