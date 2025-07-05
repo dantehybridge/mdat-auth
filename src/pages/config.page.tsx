@@ -10,9 +10,8 @@ export default function ConfigPage() {
     msalInstance.handleRedirectPromise().then((response) => {
       if (response && response.account) {
         const account = response.account;
-        setUserName(account.name?.split(" ")[0] || null);
-
         msalInstance.setActiveAccount(account);
+        setUserName(account.name || null);
 
         const rolesMEID = account.idTokenClaims?.roles || [];
         const hasRoleAuthorization = userHasAuthorizationByRoles(rolesMEID);
@@ -23,22 +22,23 @@ export default function ConfigPage() {
 
           setTimeout(() => {
             window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/`;
-          }, 1500);
+          }, 3000);
         } else {
-					setSessionValue("n", account.name?.split(" ")[0] || "earthling");
-                    
-					window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/auth/unauth`;
+          if (account.name) {
+            setSessionValue("n", account.name);
+          }
+          window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/auth/unauth`;
         }
       }
     });
   }, []);
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="text-center space-y-4">
+    <div className="flex items-center justify-center h-screen bg-gray-100 px-4">
+      <div className="bg-white p-8 rounded-2xl shadow-md text-center max-w-md w-full space-y-6">
         <div className="flex justify-center">
           <svg
-            className="animate-spin h-8 w-8 text-blue-600"
+            className="animate-spin h-10 w-10 text-blue-600"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -59,11 +59,14 @@ export default function ConfigPage() {
           </svg>
         </div>
 
-        <p className="text-xl text-gray-700 font-medium">
+        <h1 className="text-3xl font-bold text-blue-600">
           {userName ? `Welcome, ${userName}!` : "Processing login..."}
+        </h1>
+        <p className="text-gray-700 text-lg">
+          Just a moment while we get things ready for you.
         </p>
-        <p className="text-sm text-gray-500">
-          Just a moment while we redirect you.
+        <p className="text-gray-500 text-sm italic">
+          Great things come to those who wait... and wait... <span role="img" aria-label="hourglass">⌛</span>
         </p>
       </div>
     </div>
