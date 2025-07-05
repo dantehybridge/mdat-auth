@@ -10,7 +10,7 @@ export default function UnauthPage() {
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100 px-4">
       <div className="bg-white p-8 rounded-2xl shadow-md text-center max-w-md w-full space-y-6">
-        <h1 className="text-3xl font-bold text-red-600">
+        <h1 className="text-3xl font-bold">
           Access Denied
         </h1>
         <p className="text-gray-700 text-lg">

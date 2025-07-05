@@ -8,7 +8,7 @@ export default function StartsPage() {
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100 px-4">
       <div className="bg-white p-8 rounded-2xl shadow-md text-center max-w-md w-full space-y-6">
-        <h1 className="text-3xl font-bold text-blue-600">
+        <h1 className="text-3xl font-bold">
           mdat: auth
         </h1>
         <p className="text-gray-700 text-lg">

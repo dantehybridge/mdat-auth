@@ -11,7 +11,7 @@ export default function ConfigPage() {
       if (response && response.account) {
         const account = response.account;
         msalInstance.setActiveAccount(account);
-        setUserName(account.name || null);
+        setUserName(account.name?.split(" ")[0] || null);
 
         const rolesMEID = account.idTokenClaims?.roles || [];
         const hasRoleAuthorization = userHasAuthorizationByRoles(rolesMEID);
@@ -24,9 +24,7 @@ export default function ConfigPage() {
             window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/`;
           }, 3000);
         } else {
-          if (account.name) {
-            setSessionValue("n", account.name);
-          }
+					setSessionValue("n", account.name?.split(" ")[0] || "earthling");
           window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/auth/unauth`;
         }
       }
@@ -59,7 +57,7 @@ export default function ConfigPage() {
           </svg>
         </div>
 
-        <h1 className="text-3xl font-bold text-blue-600">
+        <h1 className="text-3xl font-bold">
           {userName ? `Welcome, ${userName}!` : "Processing login..."}
         </h1>
         <p className="text-gray-700 text-lg">
