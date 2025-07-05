@@ -22,10 +22,12 @@ export default function ConfigPage() {
 
           setTimeout(() => {
             window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/`;
-          }, 3000);
+          }, 2000);
         } else {
 					setSessionValue("n", account.name?.split(" ")[0] || "earthling");
-          window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/auth/unauth`;
+					setTimeout(() => {
+						window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/auth/unauth`;
+          }, 2000);
         }
       }
     });
