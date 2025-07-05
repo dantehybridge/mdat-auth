@@ -7,6 +7,15 @@ export default function ConfigPage() {
   const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
+		const queries = new URLSearchParams(window.location.search);
+		const goodbye = queries.get("goodbye");
+
+		if(goodbye) {
+			msalInstance.logoutRedirect();
+
+			return;
+		}
+		
     msalInstance.handleRedirectPromise().then((response) => {
       if (response && response.account) {
         const account = response.account;
