@@ -4,10 +4,7 @@ export default function UnauthPage() {
   const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
-    const nameFromSession = sessionStorage.getItem("n");
-    if (nameFromSession) {
-      setUserName(nameFromSession);
-    }
+		setUserName(sessionStorage.getItem("n"));
   }, []);
 
   return (

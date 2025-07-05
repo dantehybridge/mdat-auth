@@ -10,7 +10,7 @@ export default function ConfigPage() {
     msalInstance.handleRedirectPromise().then((response) => {
       if (response && response.account) {
         const account = response.account;
-        setUserName(account.name || null);
+        setUserName(account.name?.split(" ")[0] || null);
 
         msalInstance.setActiveAccount(account);
 
@@ -25,12 +25,8 @@ export default function ConfigPage() {
             window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/`;
           }, 1500);
         } else {
-          if (account.name) {
-            setSessionValue("n", account.name);
-          } else {
-						setSessionValue("n", "Earthling");
-					}
-          
+					setSessionValue("n", account.name?.split(" ")[0] || "earthling");
+                    
 					window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/auth/unauth`;
         }
       }
