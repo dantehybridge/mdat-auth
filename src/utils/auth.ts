@@ -23,7 +23,7 @@ export function userHasAuthorizationByRoles(rolesMEID: string[]): boolean {
 
     if (!Array.isArray(allowedRoles)) return false;
 
-    return rolesMEID.some((role) => allowedRoles.includes(role.toUpperCase()));
+    return rolesMEID.some((role) => allowedRoles.includes(role.toLowerCase()));
   } catch (error) {
     console.error("VITE_ROLES is not a valid JSON array.", error);
     return false;
