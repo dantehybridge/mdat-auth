@@ -5,6 +5,7 @@ export const msalSettings = {
         clientId: import.meta.env.VITE_MSAL_CLIENT_ID || "",
         authority: `https://login.microsoftonline.com/${import.meta.env.VITE_MSAL_TENANT_ID}`,
         redirectUri: `${import.meta.env.VITE_CLOUDFRONT_URL}/auth/config`,
+        postLogoutRedirectUri: `${import.meta.env.VITE_CLOUDFRONT_URL}/auth/logout`,
         navigateToLoginRequestUrl: false,
     },
     cache: {
