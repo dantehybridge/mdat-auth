@@ -18,7 +18,9 @@ export default function ConfigPage() {
       setMode("logout");
 
       setTimeout(() => {
-        msalInstance.logoutRedirect();
+        msalInstance.logoutRedirect({
+          postLogoutRedirectUri: `${import.meta.env.VITE_CLOUDFRONT_URL}/auth/logout`,
+        });
       }, 2000);
 
       return;
