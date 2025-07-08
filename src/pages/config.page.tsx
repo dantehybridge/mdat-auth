@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { msalInstance } from "../utils/msal";
+import { msalInstance, loginRequest } from "../utils/msal";
 import {
   setSessionValue,
   saveAccountToSession,
@@ -32,39 +32,59 @@ export default function ConfigPage() {
       setMode("refresh");
     }
 
-    msalInstance.handleRedirectPromise().then((response) => {
-      if (response && response.account) {
-        const account = response.account;
-        msalInstance.setActiveAccount(account);
+    msalInstance
+      .handleRedirectPromise()
+      .then((response) => {
+        if (response && response.account) {
+          const account = response.account;
+          msalInstance.setActiveAccount(account);
 
-        const firstName = account.name?.split(" ")[0] || null;
-        setUserName(firstName);
+          const firstName = account.name?.split(" ")[0] || null;
+          setUserName(firstName);
 
-        const rolesMEID = account.idTokenClaims?.roles || [];
-        const hasRoleAuthorization = userHasAuthorizationByRoles(rolesMEID);
+          const rolesMEID = account.idTokenClaims?.roles || [];
+          const hasRoleAuthorization = userHasAuthorizationByRoles(rolesMEID);
 
-        if (hasRoleAuthorization) {
-          saveAccountToSession(account);
-          setSessionValue("a", response.accessToken || "");
+          if (hasRoleAuthorization) {
+            saveAccountToSession(account);
+            setSessionValue("a", response.accessToken || "");
 
-          const returnTo = refresh
-            ? sessionStorage.getItem("post-reauth-return") || "/"
-            : `${import.meta.env.VITE_CLOUDFRONT_URL}/`;
+            const returnTo = refresh
+              ? sessionStorage.getItem("post-reauth-return") || "/"
+              : `${import.meta.env.VITE_CLOUDFRONT_URL}/`;
 
-          if (refresh) sessionStorage.removeItem("post-reauth-return");
+            if (refresh) sessionStorage.removeItem("post-reauth-return");
 
-          setTimeout(() => {
-            window.location.href = returnTo;
-          }, 2000);
+            setTimeout(() => {
+              window.location.href = returnTo;
+            }, 2000);
+          } else {
+            setSessionValue("n", firstName || "earthling");
+
+            setTimeout(() => {
+              window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/auth/unauth`;
+            }, 2000);
+          }
         } else {
-          setSessionValue("n", firstName || "earthling");
+          if (refresh) {
+            const account = msalInstance.getActiveAccount();
 
-          setTimeout(() => {
-            window.location.href = `${import.meta.env.VITE_CLOUDFRONT_URL}/auth/unauth`;
-          }, 2000);
+            if (account) {
+              msalInstance.acquireTokenRedirect({
+                scopes: { ...loginRequest.scopes },
+                account,
+              });
+            } else {
+              msalInstance.loginRedirect({
+                scopes: { ...loginRequest.scopes },
+              });
+            }
+          }
         }
-      }
-    });
+      })
+      .catch((err) => {
+        console.error("MSAL error during handleRedirectPromise:", err);
+      });
   }, []);
 
   return (
@@ -106,7 +126,7 @@ export default function ConfigPage() {
             </div>
             <h1 className="text-3xl font-bold">Refreshing your session...</h1>
             <p className="text-gray-700 text-lg">
-              Hang tight — we’re plugging your session back in.
+              Hang tight — we're plugging your session back in.
             </p>
             <p className="text-gray-500 text-sm italic">
               Even tokens need a recharge 🔋
