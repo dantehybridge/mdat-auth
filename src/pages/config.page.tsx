@@ -71,12 +71,12 @@ export default function ConfigPage() {
 
             if (account) {
               msalInstance.acquireTokenRedirect({
-                scopes: { ...loginRequest.scopes },
+                scopes: loginRequest.scopes,
                 account,
               });
             } else {
               msalInstance.loginRedirect({
-                scopes: { ...loginRequest.scopes },
+                scopes: loginRequest.scopes,
               });
             }
           }
